@@ -9,7 +9,7 @@ import './App.css';
 
 const HOST = 'https://secret-shore-94903.herokuapp.com';
 
-function formatCentsToDollars(cents: number): string {
+function formatCentsToDollars(cents) {
   if (cents < 10) {
     return `$0.0${cents}`;
   }
