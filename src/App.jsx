@@ -8,12 +8,17 @@ import {
 
 import './App.css';
 
+const { REACT_APP_ACCESS_TOKEN: ACCESS_TOKEN } = process.env;
 const HOST = 'https://secret-shore-94903.herokuapp.com';
 
 const options = (method, data, headers = {}) => ({
   method,
-  body: JSON.stringify(data),
-  headers: { 'Content-Type': 'application/json', ...headers }
+  ...(method.toLowerCase() !== 'get' && { body: JSON.stringify(data) }),
+  headers: {
+    Authorization: `Bearer ${ACCESS_TOKEN}`,
+    'Content-Type': 'application/json',
+    ...headers
+  }
 });
 
 const response = res => res.ok ? res.json() : Promise.reject(new Error(res.statusText));
@@ -37,13 +42,13 @@ const placeholderProduct = {
 };
 
 const loadProducts = props => () =>
-  fetch(`${HOST}/api/v1/products.json`)
+  fetch(`${HOST}/api/v1/products`, options('GET', {}))
     .then(response)
     .then(data => props.setProducts(data.data))
     .catch(console.log);
 
 const addToCart = (cartId, productId, quantity) =>
-  fetch(`${HOST}/api/v1/carts/${cartId}/cart_items.json`, options('POST', { productId, quantity }))
+  fetch(`${HOST}/api/v1/carts/${cartId}/cart_items`, options('POST', { productId, quantity }))
     .then(response)
     .catch(console.log);
 
