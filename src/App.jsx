@@ -9,6 +9,8 @@ import './App.css';
 
 const HOST = 'https://secret-shore-94903.herokuapp.com';
 
+const response = res => res.ok ? res.json() : Promise.reject(new Error(res.statusText))
+
 const formatCentsToDollars = cents => {
   if (cents < 10) {
     return `$0.0${cents}`;
@@ -38,8 +40,9 @@ const App = () => {
     );
 
     request
-      .then(response => response.json())
+      .then(response)
       .then(data => setProducts(data.data))
+      .catch(console.log)
   }
 
   useEffect(loadProducts, []);
@@ -145,12 +148,7 @@ const Catalog = props => {
     );
 
     request
-      .then(response => {
-        if (!response.ok) {
-          throw Error(`Unsuccessful response: ${response.statusText}`);
-        }
-        return response.json();
-      })
+      .then(response)
       .then(json => {
         console.log(json);
         return json;
