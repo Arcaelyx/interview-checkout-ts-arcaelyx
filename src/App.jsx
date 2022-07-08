@@ -9,18 +9,18 @@ import './App.css';
 
 const HOST = 'https://secret-shore-94903.herokuapp.com';
 
-function formatCentsToDollars(cents) {
+const formatCentsToDollars = cents => {
   if (cents < 10) {
     return `$0.0${cents}`;
   }
 
-  let d = (cents / 100) >> 0;
-  let c = cents % 100;
+  const d = (cents / 100) >> 0;
+  const c = cents % 100;
 
   return `$${d}.${c}`;
 };
 
-function App() {
+const App = () => {
   const placeholderProduct = {
     id: 0,
     imageSrc: '/images/loading.svg',
@@ -29,18 +29,17 @@ function App() {
   }
   const [products, setProducts] = useState([placeholderProduct]);
 
-  function loadProducts() {
+  const loadProducts = () => {
     const request = fetch(
       `${HOST}/api/v1/products.json`,
       {
-        headers: {
-        },
+        headers: {},
       }
     );
 
     request
       .then(response => response.json())
-      .then(data => setProducts(data['data']))
+      .then(data => setProducts(data.data))
   }
 
   useEffect(loadProducts, []);
@@ -81,7 +80,7 @@ function App() {
   );
 }
 
-function Cart(props) {
+const Cart = props => {
   const products = props.products;
   let cartItems = JSON.parse(JSON.stringify(products)).sort(() => 0.5 - Math.random()).slice(0, 7);
   cartItems.forEach((cartItem, index) => cartItem['quantity'] = index + 1);
@@ -126,10 +125,10 @@ function Cart(props) {
   );
 }
 
-function Catalog(props) {
+const Catalog = props => {
   const products = props.products;
 
-  function addToCart(cartId, productId, quantity) {
+  const addToCart = (cartId, productId, quantity) => {
     const requestBody = {
       productId: productId,
       quantity: quantity,
@@ -146,13 +145,13 @@ function Catalog(props) {
     );
 
     request
-      .then(function (response) {
+      .then(response => {
         if (!response.ok) {
           throw Error(`Unsuccessful response: ${response.statusText}`);
         }
         return response.json();
       })
-      .then(function (json) {
+      .then(json => {
         console.log(json);
         return json;
       })
@@ -182,12 +181,10 @@ function Catalog(props) {
   );
 }
 
-function NotFound() {
-  return (
-    <div>
-      <h1>404 Not Found</h1>
-    </div>
-  );
-}
+const NotFound = () => (
+  <div>
+    <h1>404 Not Found</h1>
+  </div>
+)
 
 export default App;
