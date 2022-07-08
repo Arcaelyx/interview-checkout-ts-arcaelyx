@@ -1,15 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   BrowserRouter as Router,
   Switch,
   Route,
   Link,
 } from 'react-router-dom';
+
 import './App.css';
 
 const HOST = 'https://secret-shore-94903.herokuapp.com';
 
-const response = res => res.ok ? res.json() : Promise.reject(new Error(res.statusText))
+const options = (method, data, headers = {}) => ({
+  method,
+  body: JSON.stringify(data),
+  headers: { 'Content-Type': 'application/json', ...headers }
+});
+
+const response = res => res.ok ? res.json() : Promise.reject(new Error(res.statusText));
 
 const formatCentsToDollars = cents => {
   if (cents < 10) {
@@ -22,30 +29,56 @@ const formatCentsToDollars = cents => {
   return `$${d}.${c}`;
 };
 
+const placeholderProduct = {
+  id: 0,
+  imageSrc: '/images/loading.svg',
+  name: 'Loading...',
+  priceCents: 0,
+};
+
+const loadProducts = props => () =>
+  fetch(`${HOST}/api/v1/products.json`)
+    .then(response)
+    .then(data => props.setProducts(data.data))
+    .catch(console.log);
+
+const addToCart = (cartId, productId, quantity) =>
+  fetch(`${HOST}/api/v1/carts/${cartId}/cart_items.json`, options('POST', { productId, quantity }))
+    .then(response)
+    .catch(console.log);
+
+const NotFound = () => (
+  <div>
+    <h1>404 Not Found</h1>
+  </div>
+);
+
+const Catalog = props => (
+  <div className='App-product-catalog'>
+    {props.products.map((product) =>
+      <div className='App-product' key={product['id']}>
+        <div className='App-product-info'>
+          <div className='App-product-icon'><img src={`${HOST}${product['imageSrc']}`} alt='' /></div>
+          <div className='App-product-details'>
+            <h1 className='App-product-name'>{product['name']}</h1>
+            {formatCentsToDollars(product['priceCents'])}
+          </div>
+        </div>
+        <div className='App-product-cart'>
+          <div></div>
+          <div>
+            <button onClick={() => addToCart(undefined, product['id'], 1)}>Add to cart</button>
+          </div>
+        </div>
+      </div>
+    )}
+  </div>
+);
+
+
 const App = () => {
-  const placeholderProduct = {
-    id: 0,
-    imageSrc: '/images/loading.svg',
-    name: 'Loading...',
-    priceCents: 0,
-  }
   const [products, setProducts] = useState([placeholderProduct]);
-
-  const loadProducts = () => {
-    const request = fetch(
-      `${HOST}/api/v1/products.json`,
-      {
-        headers: {},
-      }
-    );
-
-    request
-      .then(response)
-      .then(data => setProducts(data.data))
-      .catch(console.log)
-  }
-
-  useEffect(loadProducts, []);
+  useEffect(loadProducts({ setProducts }), []);
 
   return (
     <Router>
@@ -127,62 +160,5 @@ const Cart = props => {
     </div>
   );
 }
-
-const Catalog = props => {
-  const products = props.products;
-
-  const addToCart = (cartId, productId, quantity) => {
-    const requestBody = {
-      productId: productId,
-      quantity: quantity,
-    };
-    const request = fetch(
-      `${HOST}/api/v1/carts/${cartId}/cart_items.json`,
-      {
-        method: 'POST',
-        body: JSON.stringify(requestBody),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    request
-      .then(response)
-      .then(json => {
-        console.log(json);
-        return json;
-      })
-      .catch(error => console.log(error));
-  }
-
-  return (
-    <div className='App-product-catalog'>
-      {products.map((product) =>
-        <div className='App-product' key={product['id']}>
-          <div className='App-product-info'>
-            <div className='App-product-icon'><img src={`${HOST}${product['imageSrc']}`} alt='' /></div>
-            <div className='App-product-details'>
-              <h1 className='App-product-name'>{product['name']}</h1>
-              {formatCentsToDollars(product['priceCents'])}
-            </div>
-          </div>
-          <div className='App-product-cart'>
-            <div></div>
-            <div>
-              <button onClick={addToCart.bind(this, undefined, product['id'], 1)}>Add to cart</button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-const NotFound = () => (
-  <div>
-    <h1>404 Not Found</h1>
-  </div>
-)
 
 export default App;
