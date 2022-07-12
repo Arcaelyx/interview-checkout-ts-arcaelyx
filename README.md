@@ -15,3 +15,9 @@ To get the application started, simply run the following commands:
 ```sh
 $ npm install && npm start
 ```
+
+In order to run the tests, simply run the following command:
+
+```sh
+$ npm test
+```
