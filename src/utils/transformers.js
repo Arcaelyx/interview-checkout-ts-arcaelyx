@@ -7,4 +7,7 @@ export const formatCentsToDollars = cents => {
   const c = cents % 100;
 
   return `$${d}.${c}`;
-};
+}
+
+export const itemQuantity = ({ cart: { items } }) =>
+  items ? `${items.length} item${items.length > 1 ? 's' : ''}` : 'No items'

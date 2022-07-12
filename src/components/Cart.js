@@ -1,14 +1,18 @@
+import { useEffect } from 'react';
+import { connect } from 'react-redux';
+
 import { formatCentsToDollars } from '../utils/transformers';
+import { handleEffect } from '../handlers'
+
+import { createCart, deleteFromCart, getCart } from '../actions/cart';
 
 import CartItem from './CartItem';
 
 const Cart = props => {
-  const cartItems = props.products.sort(() => 0.5 - Math.random()).slice(0, 7)
-    .map((item, index) => ({ ...item, quantity: index + 1 }));
-
+  useEffect(handleEffect(props), [])
   return (
     <div className='App-product-catalog'>
-      {cartItems.map(cartItem => <CartItem key={cartItem.id} {...cartItem} />)}
+      { props.cart.items.map(item => <CartItem key={item.id} {...item} />) }
       <hr />
       <div className='App-row'>
         <div className='App-righter'>
@@ -17,7 +21,7 @@ const Cart = props => {
               Subtotal:
             </div>
             <div className='App-flex-col'>
-              {formatCentsToDollars(cartItems.map(cartItem => cartItem['quantity'] * cartItem['priceCents']).reduce((a, b) => a + b, 0))}
+              { formatCentsToDollars(props.cart.items.map(item => item['quantity'] * item['priceCents']).reduce((a, b) => a + b, 0)) }
             </div>
           </div>
         </div>
@@ -26,4 +30,8 @@ const Cart = props => {
   );
 }
 
-export default Cart;
+export default connect(({ cart }) => ({ cart }), {
+  createCart,
+  deleteFromCart,
+  getCart
+})(Cart);
