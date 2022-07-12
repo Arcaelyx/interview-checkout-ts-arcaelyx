@@ -13,7 +13,7 @@ const Catalog = props => {
   useEffect(() => props.getProducts(), []);
   return (
     <div className='App-product-catalog'>
-      { props.products.map(product =>
+      { props.products.state.map(product =>
         <div className='App-product' key={product.id}>
           <div className='App-product-info'>
             <div className='App-product-icon'><img src={`${HOST}${product.imageSrc}`} alt='' /></div>
