@@ -1,4 +1,4 @@
-# Odeko Checkout interview project
+# Cart checkout interview project
 
 ## Getting Started
 
